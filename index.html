@@ -73,15 +73,63 @@ tr:hover td{background:#fafafa;}
 /* 구분선 */
 .section-div{height:1px;background:#ebebeb;margin:28px 0;}
 
+/* 필터 바 (정렬+홀수) */
+.filter-bar{display:flex;flex-wrap:wrap;gap:16px 24px;margin:16px 0 20px;padding:14px 16px;background:#fafaf8;border-radius:12px;}
+.filter-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-label{font-size:11px;color:#888;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;}
+.filter-btns{display:flex;gap:6px;flex-wrap:wrap;}
+
 /* 모바일 탭 피드백 */
-.rtab,.chip,.sbtn,#ySel{-webkit-tap-highlight-color:transparent;transition:transform .1s ease, background-color .15s, border-color .15s, opacity .12s;}
-.rtab:active,.chip:active,.sbtn:active{transform:scale(0.94);opacity:0.85;}
+.rtab,.chip,.sbtn,.fbtn,#ySel{-webkit-tap-highlight-color:transparent;transition:transform .1s ease, background-color .15s, border-color .15s, opacity .12s;}
+.rtab:active,.chip:active,.sbtn:active,.fbtn:active{transform:scale(0.94);opacity:0.85;}
 button{cursor:pointer;}
 @media(hover:none){
-  .rtab:active,.chip:active,.sbtn:active{transform:scale(0.92);filter:brightness(0.92);}
+  .rtab:active,.chip:active,.sbtn:active,.fbtn:active{transform:scale(0.92);filter:brightness(0.92);}
 }
 
+/* 데스크탑/태블릿 */
 @media(max-width:900px){.krow,.rrow{grid-template-columns:repeat(2,1fr);}.cgrid{grid-template-columns:1fr;}}
+
+/* 모바일 (768px 이하) */
+@media(max-width:768px){
+  .wrap{padding:18px 14px;}
+  .hdr{padding-bottom:18px;margin-bottom:22px;gap:12px;}
+  .hdr-left h1{font-size:19px;line-height:1.3;}
+  .hdr-left p{font-size:12px;line-height:1.5;}
+  .hdr select{font-size:13px;padding:7px 12px;}
+  .rtabs{gap:6px;}
+  .rtab{font-size:12px;padding:6px 14px;}
+  .chips{gap:6px;}
+  .chip{font-size:11px;padding:5px 11px;}
+  .slbl{font-size:11px;}
+  .kpi{padding:14px 16px;border-radius:12px;}
+  .kpi .lbl{font-size:11px;}
+  .kpi .val{font-size:22px;}
+  .kpi .unit{font-size:13px;}
+  .rkpi{padding:12px 14px;}
+  .rkpi .val{font-size:17px;}
+  .card{padding:18px 16px;border-radius:14px;}
+  .card-h{font-size:12px;margin-bottom:14px;}
+  .tcard{padding:18px 14px;border-radius:14px;}
+  .tcard-h{font-size:14px;}
+  .filter-bar{padding:12px 14px;gap:12px 16px;flex-direction:column;align-items:stretch;}
+  .filter-group{align-items:flex-start;}
+  .filter-label{font-size:10px;width:100%;margin-bottom:2px;}
+  table{font-size:12px;}
+  th{font-size:10px;padding:6px 8px;}
+  td{padding:8px;font-size:12px;}
+  .bb{width:50px;}
+}
+
+/* 작은 모바일 (560px 이하) */
+@media(max-width:560px){
+  .krow,.rrow{grid-template-columns:1fr;gap:10px;}
+  .wrap{padding:14px 12px;}
+  .hdr-left h1{font-size:17px;}
+  .kpi .val{font-size:24px;}
+  .filter-btns{gap:5px;}
+  .sbtn,.fbtn{font-size:11px!important;padding:6px 11px!important;}
+}
 @media(max-width:560px){.krow,.rrow{grid-template-columns:1fr;}.wrap{padding:20px 16px;}.hdr-left h1{font-size:20px;}}
 </style>
 </head>
@@ -105,11 +153,6 @@ button{cursor:pointer;}
 
 <div class="rtabs" id="rtabs"></div>
 <div class="chips" id="chips"></div>
-
-<div id="sortBar" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-  <span style="font-size:12px;color:#888;font-weight:600;letter-spacing:.04em;">정렬 기준</span>
-  <div id="sortBtns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-</div>
 
 <div class="slbl" id="kLbl">📊 핵심 지표 — 매출액 · 홀당 매출액</div>
 <div class="krow" id="kRow"></div>
@@ -149,6 +192,18 @@ button{cursor:pointer;}
 
 <div class="tcard">
   <div class="tcard-h" id="tTit">홀당 매출 순위</div>
+  
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">정렬 기준</span>
+      <div id="sortBtns" class="filter-btns"></div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">홀수 필터</span>
+      <div id="holeBtns" class="filter-btns"></div>
+    </div>
+  </div>
+  
   <div class="tw"><table><thead><tr id="tH"></tr></thead><tbody id="tB"></tbody></table></div>
   <div class="tn" id="tN"></div>
 </div>
@@ -278,11 +333,19 @@ const DB={
 
 function sorted(rg,y,metric){
   const m=metric||sortBy;
-  const lst=rg?[...DB[rg]]:[...DB.수도권,...DB.강원권,...DB.경북권,...DB.경남권];
+  let lst=rg?[...DB[rg]]:[...DB.수도권,...DB.강원권,...DB.경북권,...DB.경남권];
+  if(holeFilter!=='all'){
+    lst=lst.filter(c=>{
+      if(holeFilter==='18')return c.h===18;
+      if(holeFilter==='27')return c.h===27;
+      if(holeFilter==='36+')return c.h>=36;
+      return true;
+    });
+  }
   return lst.filter(c=>c[m][y]!=null).sort((a,b)=>(b[m][y]||0)-(a[m][y]||0));
 }
 
-let aR=null,aC=null,CH={},sortBy='ph';
+let aR=null,aC=null,CH={},sortBy='ph',holeFilter='all';
 const gY=()=>parseInt(document.getElementById('ySel').value);
 const pct=(a,b)=>(a!=null&&b!=null&&b>0)?((a-b)/b*100).toFixed(1):null;
 const fD=(v)=>{if(v==null)return'';const f=parseFloat(v);return`<span class="${f>=0?'up':'dn'}">${f>=0?'▲+':'▼'}${Math.abs(f)}%</span>`;};
@@ -292,15 +355,25 @@ const SORT_LABELS={ph:'홀당 매출',rev:'매출액',oi:'영업이익',ni:'당�
 const SORT_UNITS={ph:'백만',rev:'억',oi:'억',ni:'억'};
 
 function setSort(m){sortBy=m;buzz();render();}
+function setHoleFilter(f){holeFilter=f;buzz();render();}
 
-function render(){const y=gY();renderTabs();renderSortBtns();renderChips(y);if(aC)renderClub(y);else renderRegion(y);}
+function render(){const y=gY();renderTabs();renderSortBtns();renderHoleBtns();renderChips(y);if(aC)renderClub(y);else renderRegion(y);}
 
 function renderSortBtns(){
   const el=document.getElementById('sortBtns');
   const btns=[['ph','홀당 매출'],['rev','매출액'],['oi','영업이익'],['ni','당기순이익']];
   el.innerHTML=btns.map(([k,lbl])=>{
     const on=sortBy===k;
-    return`<button class="sbtn" style="font-size:12px;padding:5px 14px;border-radius:8px;border:1px solid ${on?'#333':'#ddd'};background:${on?'#333':'#fff'};color:${on?'#fff':'#666'};cursor:pointer;font-weight:${on?600:500};font-family:'Noto Sans KR',sans-serif;transition:all .12s;" onclick="setSort('${k}')">${lbl}</button>`;
+    return`<button class="sbtn" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid ${on?'#333':'#ddd'};background:${on?'#333':'#fff'};color:${on?'#fff':'#666'};cursor:pointer;font-weight:${on?600:500};font-family:'Noto Sans KR',sans-serif;" onclick="setSort('${k}')">${lbl}</button>`;
+  }).join('');
+}
+
+function renderHoleBtns(){
+  const el=document.getElementById('holeBtns');
+  const btns=[['all','전체'],['18','18홀'],['27','27홀'],['36+','36홀+']];
+  el.innerHTML=btns.map(([k,lbl])=>{
+    const on=holeFilter===k;
+    return`<button class="fbtn" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid ${on?'#333':'#ddd'};background:${on?'#333':'#fff'};color:${on?'#fff':'#666'};cursor:pointer;font-weight:${on?600:500};font-family:'Noto Sans KR',sans-serif;" onclick="setHoleFilter('${k}')">${lbl}</button>`;
   }).join('');
 }
 
@@ -419,12 +492,17 @@ function mkChart(id,ds,cb,li,cols){
 function renderTable(y){
   let clubs,title,note='';
   const sortLbl=SORT_LABELS[sortBy];
-  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} ${sortLbl} TOP 10 (${y}년 기준)`;note=`* ${aC.name} 강조 표시`;}
-  else if(aR){clubs=sorted(aR,y);title=`${aR} 골프장 ${sortLbl} 순위 (${y}년 · ${clubs.length}개소)`;}
-  else{clubs=sorted(null,y).slice(0,30);title=`전체 골프장 ${sortLbl} TOP 30 (${y}년 기준)`;note='* 4개 권역 전체 기준 TOP 30';}
+  const holeLbl=holeFilter==='all'?'':` · ${holeFilter==='36+'?'36홀+':holeFilter+'홀'}`;
+  
+  // 평균 계산용: 필터 적용된 전체 골프장 (TOP 제한 없이)
+  const allClubs = sorted(aR,y);
+  
+  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} ${sortLbl} TOP 10 (${y}년${holeLbl})`;note=`* ${aC.name} 강조 표시`;}
+  else if(aR){clubs=allClubs;title=`${aR} 골프장 ${sortLbl} 순위 (${y}년${holeLbl} · ${clubs.length}개소)`;}
+  else{clubs=allClubs.slice(0,30);title=`전체 골프장 ${sortLbl} TOP 30 (${y}년${holeLbl})`;note=`* 4개 권역 전체 ${allClubs.length}개소 중 TOP 30 표시`;}
+  
   document.getElementById('tTit').textContent=title;
   document.getElementById('tN').textContent=note;
-  // 정렬 기준 컬럼을 강조 표시
   const cols=[['ph','홀당 매출'],['rev','매출액'],['oi','영업이익'],['ni','당기순이익']];
   document.getElementById('tH').innerHTML=`<th>#</th><th>골프장명</th><th>권역</th><th>홀수</th>`+cols.map(([k,lbl])=>{
     const isSort=k===sortBy;
@@ -432,9 +510,13 @@ function renderTable(y){
   }).join('');
   const sortKey=sortBy, sortUnit=SORT_UNITS[sortBy];
   const mx=Math.max(...clubs.map(c=>c[sortKey][y]||0));
-  const validVals=clubs.map(c=>c[sortKey][y]||0).filter(v=>v>0);
-  const avg=validVals.length?(validVals.reduce((a,b)=>a+b,0)/validVals.length):0;
-  const avgDisp=sortKey==='ph'?Math.round(avg):avg.toFixed(1);
+  
+  // 평균은 항상 필터된 전체 골프장 기준 (TOP 30 제한 X)
+  const avgVals = allClubs.map(c=>c[sortKey][y]||0).filter(v=>v>0);
+  const avg = avgVals.length ? (avgVals.reduce((a,b)=>a+b,0)/avgVals.length) : 0;
+  const avgDisp = sortKey==='ph' ? Math.round(avg).toLocaleString() : avg.toFixed(1);
+  const avgScope = aR ? aR : '전체';
+  
   document.getElementById('tB').innerHTML=clubs.map((c,i)=>{
     const sv=c[sortKey][y]||0;
     const pt=mx?(sv/mx*100).toFixed(0):0;
@@ -453,7 +535,7 @@ function renderTable(y){
       <td style="${cellStyle('ni')};${sortKey==='ni'?'':'color:#999'}">${sortKey==='ni'&&c.ni[y]!=null?`<div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div><span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${fmt('ni',c.ni[y])}</span></div>`:fmt('ni',c.ni[y])}</td>
     </tr>`;
   }).join('')+`<tr class="avr">
-    <td colspan="4" style="color:#777">📌 ${aR||'전체'} 평균 (${y}년 · ${sortLbl})</td>
+    <td colspan="4" style="color:#777">📌 ${avgScope} ${avgVals.length}개소 평균 (${y}년 · ${sortLbl}${holeLbl})</td>
     <td colspan="4" style="text-align:left;padding-left:12px;"><div class="bw">
       <div class="bb"><div class="bf" style="width:${mx?(avg/mx*100).toFixed(0):0}%;background:#999"></div></div>
       <span style="min-width:60px;font-weight:700">${avgDisp}${sortUnit}</span>
