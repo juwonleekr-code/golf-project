@@ -399,29 +399,31 @@ function renderChips(y){
 function setC(r,n){buzz();aC=DB[r].find(c=>c.name===n);render();}
 
 function renderRegion(y){
-  const py=y-1,regs=aR?[aR]:RG;
+  const baseY=2020, regs=aR?[aR]:RG;
+  const isBase=y===baseY;
   document.getElementById('kLbl').textContent=aR?`📊 핵심 지표 — ${aR} (${y}년)`:`📊 핵심 지표 — 4개 권역 (${y}년)`;
   const ke=document.getElementById('kRow');
   ke.style.gridTemplateColumns=`repeat(${Math.min(regs.length,4)},1fr)`;
   ke.innerHTML=regs.map(r=>{
-    const v=ST[r].ph[y]||0,vp=ST[r].ph[py]||0,rv=ST[r].rev[y]||0,d=pct(v,vp);
+    const v=ST[r].ph[y]||0,vb=ST[r].ph[baseY]||0,d=isBase?null:pct(v,vb);
     return`<div class="kpi" style="border-top-color:${CL[r]}">
       <div class="lbl">${r} 홀당 매출</div>
       <div class="val">${v.toLocaleString()}<span class="unit"> 백만</span></div>
-      <div class="sub">${fD(d)}</div>
+      <div class="sub">${isBase?'<span class="nt">기준연도</span>':fD(d)+'<span class="nt"> vs 2020</span>'}</div>
     </div>`;
   }).join('');
   const re=document.getElementById('rRow');
   re.style.gridTemplateColumns=`repeat(${Math.min(regs.length,4)},1fr)`;
   re.innerHTML=regs.map(r=>{
     const oi=ST[r].oi[y]||0,ni=ST[r].ni[y]||0;
+    const oid=isBase?null:pct(oi,ST[r].oi[baseY]),nid=isBase?null:pct(ni,ST[r].ni[baseY]);
     return`<div class="rkpi" style="border-top-color:${CL[r]}66">
       <div class="lbl">${r}</div>
       <div class="val">${oi.toFixed(1)}<span style="font-size:12px;font-weight:400">억</span></div>
-      <div class="sub nt">영업이익 ${fD(pct(oi,ST[r].oi[py]))}</div>
+      <div class="sub nt">영업이익 ${isBase?'기준':fD(oid)}</div>
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0">
         <div class="val">${ni.toFixed(1)}<span style="font-size:12px;font-weight:400">억</span></div>
-        <div class="sub nt">당기순이익 ${fD(pct(ni,ST[r].ni[py]))}</div>
+        <div class="sub nt">당기순이익 ${isBase?'기준':fD(nid)}</div>
       </div>
     </div>`;
   }).join('');
@@ -436,7 +438,8 @@ function renderRegion(y){
 }
 
 function renderClub(y){
-  const c=aC,col=CL[c.r],py=y-1;
+  const c=aC,col=CL[c.r],baseY=2020;
+  const isBase=y===baseY;
   document.getElementById('kLbl').textContent=`📊 ${c.name} — 핵심 지표 (${y}년)`;
   const phY=c.ph[y]??null,rvY=c.rev[y]??null;
   const ke=document.getElementById('kRow');
@@ -445,12 +448,12 @@ function renderClub(y){
     <div class="kpi" style="border-top-color:${col}">
       <div class="lbl">홀당 매출 (${y}년)</div>
       <div class="val">${phY!=null?phY.toLocaleString():'-'}<span class="unit"> 백만</span></div>
-      <div class="sub">${fD(pct(phY,c.ph[py]))}<span class="nt"> 전년대비</span></div>
+      <div class="sub">${isBase?'<span class="nt">기준연도</span>':fD(pct(phY,c.ph[baseY]))+'<span class="nt"> vs 2020</span>'}</div>
     </div>
     <div class="kpi" style="border-top-color:${col}88">
       <div class="lbl">매출액 (${y}년)</div>
       <div class="val">${rvY!=null?rvY.toFixed(1):'-'}<span class="unit"> 억</span></div>
-      <div class="sub">${fD(pct(rvY,c.rev[py]))}<span class="nt"> ${c.h}홀</span></div>
+      <div class="sub">${isBase?`<span class="nt">${c.h}홀</span>`:fD(pct(rvY,c.rev[baseY]))+`<span class="nt"> vs 2020 · ${c.h}홀</span>`}</div>
     </div>`;
   const oiY=c.oi[y]??null,niY=c.ni[y]??null;
   const re=document.getElementById('rRow');
@@ -459,12 +462,12 @@ function renderClub(y){
     <div class="rkpi" style="border-top-color:${col}55">
       <div class="lbl">영업이익 (${y}년)</div>
       <div class="val">${oiY!=null?oiY.toFixed(1):'-'}<span style="font-size:12px;font-weight:400">억</span></div>
-      <div class="sub nt">${fD(pct(oiY,c.oi[py]))}</div>
+      <div class="sub nt">${isBase?'기준':fD(pct(oiY,c.oi[baseY]))+' vs 2020'}</div>
     </div>
     <div class="rkpi" style="border-top-color:${col}44">
       <div class="lbl">당기순이익 (${y}년)</div>
       <div class="val">${niY!=null?niY.toFixed(1):'-'}<span style="font-size:12px;font-weight:400">억</span></div>
-      <div class="sub nt">${fD(pct(niY,c.ni[py]))}</div>
+      <div class="sub nt">${isBase?'기준':fD(pct(niY,c.ni[baseY]))+' vs 2020'}</div>
     </div>`;
   document.getElementById('ch1').innerHTML=`${c.name} 매출액 추이 <span class="bdg">핵심</span>`;
   document.getElementById('ch2').innerHTML=`${c.name} 홀당 매출 추이 <span class="bdg">핵심</span>`;
