@@ -304,7 +304,7 @@ function renderRegion(y){
     return`<div class="kpi" style="border-top-color:${CL[r]}">
       <div class="lbl">${r} 홀당 매출</div>
       <div class="val">${v.toLocaleString()}<span class="unit"> 백만</span></div>
-      <div class="sub">${fD(d)}<span class="nt"> 평균 ${rv.toFixed(0)}억</span></div>
+      <div class="sub">${fD(d)}</div>
     </div>`;
   }).join('');
   const re=document.getElementById('rRow');
