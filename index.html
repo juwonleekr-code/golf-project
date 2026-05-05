@@ -1,59 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대중제 골프장 매출 현황 분석</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-.dash{padding:.75rem 0;font-family:sans-serif;}
-.hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:.5px solid var(--color-border-tertiary);}
-.hdr h1{font-size:15px;font-weight:600;color:var(--color-text-primary);}
-.hdr p{font-size:11px;color:var(--color-text-secondary);margin-top:3px;}
-.hdr select{font-size:12px;padding:5px 8px;border-radius:8px;border:.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);}
-.rtabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
-.rtab{font-size:12px;padding:5px 16px;border-radius:99px;border:.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
-.chip{font-size:11px;padding:4px 12px;border-radius:6px;border:.5px solid;background:var(--color-background-primary);cursor:pointer;}
-.slbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-secondary);margin-bottom:8px;}
-.slbl.ref{color:#aaa;}
-.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.5rem;}
-.kpi{background:var(--color-background-secondary);border-radius:8px;padding:10px 12px;border-top:2.5px solid transparent;}
-.kpi .lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px;}
-.kpi .val{font-size:20px;font-weight:600;color:var(--color-text-primary);line-height:1.2;}
-.kpi .unit{font-size:12px;font-weight:400;}
-.kpi .sub{font-size:11px;margin-top:3px;}
-.up{color:#1D9E75;}.dn{color:#D85A30;}.nt{color:var(--color-text-secondary);}
-.rrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;}
-.rkpi{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 12px;border-top:2px solid transparent;}
-.rkpi .lbl{font-size:11px;color:#aaa;margin-bottom:2px;}
-.rkpi .val{font-size:16px;font-weight:500;color:var(--color-text-secondary);}
-.rkpi .sub{font-size:11px;margin-top:2px;}
-.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem;}
-.card-h{font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:12px;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-.bdg{font-size:10px;padding:2px 7px;border-radius:99px;background:#E6F1FB;color:#185FA5;font-weight:500;text-transform:none;letter-spacing:0;}
-.bdg.ref{background:#f0f0f0;color:#888;}
-.leg{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
-.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);}
-.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
-.div{height:.5px;background:var(--color-border-tertiary);margin:1rem 0;}
-.tw{overflow-x:auto;margin-top:8px;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{text-align:left;font-weight:600;color:var(--color-text-secondary);font-size:10px;padding:5px 8px;border-bottom:.5px solid var(--color-border-tertiary);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em;}
-td{padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);color:var(--color-text-primary);white-space:nowrap;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--color-background-secondary);}
-.bw{display:flex;align-items:center;gap:6px;}
-.bb{background:var(--color-background-secondary);border-radius:3px;height:5px;width:70px;flex-shrink:0;}
-.bf{height:5px;border-radius:3px;}
-.avr td{background:var(--color-background-secondary)!important;font-weight:600;}
-.tn{font-size:11px;color:var(--color-text-secondary);margin-top:6px;}
-@media(max-width:580px){.krow,.rrow{grid-template-columns:repeat(2,1fr);}.cgrid{grid-template-columns:1fr;}}
-</style>
+body{font-family:'Noto Sans KR',sans-serif;background:#f7f7f5;color:#1a1a1a;}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 28px;}
 
-<div class="dash">
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">대중제 골프장 지역별 홀당 매출 비교 대시보드 2020-2025</h2>
+/* 헤더 */
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;padding-bottom:24px;border-bottom:1.5px solid #e8e8e4;}
+.hdr-left h1{font-size:26px;font-weight:700;color:#111;letter-spacing:-.5px;margin-bottom:6px;}
+.hdr-left p{font-size:13px;color:#888;line-height:1.6;}
+.hdr select{font-size:14px;padding:8px 14px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#111;font-family:'Noto Sans KR',sans-serif;cursor:pointer;}
+
+/* 탭 */
+.rtabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.rtab{font-size:13px;padding:7px 20px;border-radius:99px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;transition:all .15s;font-family:'Noto Sans KR',sans-serif;}
+
+/* 칩 */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;min-height:0;}
+.chip{font-size:12px;padding:5px 14px;border-radius:8px;border:1px solid;background:#fff;cursor:pointer;transition:all .12s;font-family:'Noto Sans KR',sans-serif;}
+
+/* 섹션 라벨 */
+.slbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:12px;padding-left:2px;}
+.slbl.ref{color:#bbb;}
+
+/* KPI 카드 */
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;}
+.kpi{background:#fff;border-radius:14px;padding:18px 20px;border:1px solid #ebebeb;border-top:3px solid transparent;}
+.kpi .lbl{font-size:12px;color:#999;margin-bottom:8px;font-weight:500;}
+.kpi .val{font-size:28px;font-weight:700;color:#111;line-height:1.15;}
+.kpi .unit{font-size:15px;font-weight:500;}
+.kpi .sub{font-size:12px;margin-top:6px;}
+.up{color:#1D9E75;}.dn{color:#D85A30;}.nt{color:#999;}
+
+/* 참고 KPI */
+.divider{height:1px;background:#ebebeb;margin:20px 0;}
+.rrow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.rkpi{background:#fff;border-radius:12px;padding:16px 20px;border:1px solid #ebebeb;border-top:2px solid transparent;}
+.rkpi .lbl{font-size:12px;color:#bbb;margin-bottom:6px;font-weight:500;}
+.rkpi .val{font-size:20px;font-weight:600;color:#888;}
+.rkpi .sub{font-size:12px;margin-top:4px;}
+
+/* 차트 카드 */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.card{background:#fff;border:1px solid #ebebeb;border-radius:16px;padding:24px;}
+.card-h{font-size:13px;font-weight:700;color:#555;margin-bottom:16px;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.bdg{font-size:11px;padding:3px 9px;border-radius:99px;background:#EBF4FF;color:#1a6fcc;font-weight:600;text-transform:none;letter-spacing:0;}
+.bdg.ref{background:#f3f3f3;color:#999;}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;}
+.li{display:flex;align-items:center;gap:5px;font-size:12px;color:#888;}
+.ld{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* 테이블 */
+.tcard{background:#fff;border:1px solid #ebebeb;border-radius:16px;padding:24px;margin-top:4px;}
+.tcard-h{font-size:15px;font-weight:700;color:#111;margin-bottom:4px;}
+.tw{overflow-x:auto;margin-top:16px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-weight:700;color:#999;font-size:11px;padding:8px 12px;border-bottom:1.5px solid #f0f0f0;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;}
+td{padding:10px 12px;border-bottom:1px solid #f5f5f3;color:#222;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+.bw{display:flex;align-items:center;gap:8px;}
+.bb{background:#f0f0f0;border-radius:3px;height:6px;width:80px;flex-shrink:0;}
+.bf{height:6px;border-radius:3px;}
+.avr td{background:#f9f9f7!important;font-weight:700;}
+.tn{font-size:12px;color:#bbb;margin-top:10px;}
+
+/* 구분선 */
+.section-div{height:1px;background:#ebebeb;margin:28px 0;}
+
+@media(max-width:900px){.krow,.rrow{grid-template-columns:repeat(2,1fr);}.cgrid{grid-template-columns:1fr;}}
+@media(max-width:560px){.krow,.rrow{grid-template-columns:1fr;}.wrap{padding:20px 16px;}.hdr-left h1{font-size:20px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
 
 <div class="hdr">
-  <div>
+  <div class="hdr-left">
     <h1>⛳ 대중제 골프장 매출 현황 분석</h1>
-    <p>수도권 · 강원권 · 경북권 · 경남권 | 홀당 매출 기준 | 포항 학전 골프장(18홀) 개발 참고자료</p>
+    <p>수도권 · 강원권 · 경북권 · 경남권 &nbsp;|&nbsp; 홀당 매출 기준 비교 &nbsp;|&nbsp; 포항 학전 골프장(18홀) 개발 참고자료</p>
   </div>
   <select id="ySel" onchange="render()">
     <option value="2025">2025년</option>
@@ -67,26 +97,49 @@ tr:hover td{background:var(--color-background-secondary);}
 
 <div class="rtabs" id="rtabs"></div>
 <div class="chips" id="chips"></div>
-<div class="slbl" id="kLbl">핵심 지표 — 매출액 · 홀당 매출액</div>
+
+<div class="slbl" id="kLbl">📊 핵심 지표 — 매출액 · 홀당 매출액</div>
 <div class="krow" id="kRow"></div>
-<div class="div"></div>
+
+<div class="divider"></div>
+
 <div class="slbl ref">참고 지표 — 영업이익 · 당기순이익 (개소 평균)</div>
 <div class="rrow" id="rRow"></div>
 
+<div class="section-div"></div>
+
 <div class="cgrid">
-  <div class="card"><div class="card-h" id="ch1">매출액 추이 <span class="bdg">핵심</span></div><div style="position:relative;height:200px"><canvas id="c1" role="img" aria-label="매출액 추이 차트"></canvas></div><div class="leg" id="l1"></div></div>
-  <div class="card"><div class="card-h" id="ch2">홀당 매출액 추이 <span class="bdg">핵심</span></div><div style="position:relative;height:200px"><canvas id="c2" role="img" aria-label="홀당 매출액 추이 차트"></canvas></div><div class="leg" id="l2"></div></div>
-</div>
-<div class="cgrid">
-  <div class="card"><div class="card-h">영업이익 추이 <span class="bdg ref">참고</span></div><div style="position:relative;height:160px"><canvas id="c3" role="img" aria-label="영업이익 추이 차트"></canvas></div><div class="leg" id="l3"></div></div>
-  <div class="card"><div class="card-h">당기순이익 추이 <span class="bdg ref">참고</span></div><div style="position:relative;height:160px"><canvas id="c4" role="img" aria-label="당기순이익 추이 차트"></canvas></div><div class="leg" id="l4"></div></div>
+  <div class="card">
+    <div class="card-h" id="ch1">매출액 추이 <span class="bdg">핵심</span></div>
+    <div style="position:relative;height:220px"><canvas id="c1" role="img" aria-label="매출액 추이"></canvas></div>
+    <div class="leg" id="l1"></div>
+  </div>
+  <div class="card">
+    <div class="card-h" id="ch2">홀당 매출액 추이 <span class="bdg">핵심</span></div>
+    <div style="position:relative;height:220px"><canvas id="c2" role="img" aria-label="홀당 매출액 추이"></canvas></div>
+    <div class="leg" id="l2"></div>
+  </div>
 </div>
 
-<div class="card">
-  <div class="card-h" id="tTit">홀당 매출 순위</div>
+<div class="cgrid">
+  <div class="card">
+    <div class="card-h">영업이익 추이 <span class="bdg ref">참고</span></div>
+    <div style="position:relative;height:180px"><canvas id="c3" role="img" aria-label="영업이익 추이"></canvas></div>
+    <div class="leg" id="l3"></div>
+  </div>
+  <div class="card">
+    <div class="card-h">당기순이익 추이 <span class="bdg ref">참고</span></div>
+    <div style="position:relative;height:180px"><canvas id="c4" role="img" aria-label="당기순이익 추이"></canvas></div>
+    <div class="leg" id="l4"></div>
+  </div>
+</div>
+
+<div class="tcard">
+  <div class="tcard-h" id="tTit">홀당 매출 순위</div>
   <div class="tw"><table><thead><tr id="tH"></tr></thead><tbody id="tB"></tbody></table></div>
   <div class="tn" id="tN"></div>
 </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -218,17 +271,13 @@ const gY=()=>parseInt(document.getElementById('ySel').value);
 const pct=(a,b)=>(a!=null&&b!=null&&b>0)?((a-b)/b*100).toFixed(1):null;
 const fD=(v)=>{if(v==null)return'';const f=parseFloat(v);return`<span class="${f>=0?'up':'dn'}">${f>=0?'▲+':'▼'}${Math.abs(f)}%</span>`;};
 
-function render(){
-  const y=gY();
-  renderTabs(); renderChips(y);
-  if(aC) renderClub(y); else renderRegion(y);
-}
+function render(){const y=gY();renderTabs();renderChips(y);if(aC)renderClub(y);else renderRegion(y);}
 
 function renderTabs(){
   document.getElementById('rtabs').innerHTML=
-    `<button class="rtab${!aR?' on':''}" style="${!aR?'background:#555;border-color:#555;color:#fff':''}" onclick="setR(null)">전체</button>`+
+    `<button class="rtab${!aR?' on':''}" style="${!aR?'background:#333;border-color:#333;color:#fff;font-weight:600':''}" onclick="setR(null)">전체</button>`+
     RG.map(r=>{const on=r===aR,c=CL[r];
-      return`<button class="rtab${on?' on':''}" style="${on?`background:${c};border-color:${c};color:#fff`:`color:${c};border-color:${c}44`}" onclick="setR('${r}')">${r}</button>`;
+      return`<button class="rtab${on?' on':''}" style="${on?`background:${c};border-color:${c};color:#fff;font-weight:600`:`color:${c};border-color:${c}55`}" onclick="setR('${r}')">${r}</button>`;
     }).join('');
 }
 function setR(r){aR=r;aC=null;render();}
@@ -239,9 +288,7 @@ function renderChips(y){
   const col=CL[aR];
   el.innerHTML=sorted(aR,y).slice(0,10).map((c,i)=>{
     const on=aC&&aC.name===c.name;
-    return`<button class="chip${on?' active':''}"
-      style="${on?`background:${col};border-color:${col};color:#fff`:`border-color:${col};color:${col};background:${col}12`}"
-      onclick="setC('${aR}','${c.name.replace(/'/g,"\\'")}')">
+    return`<button class="chip" style="${on?`background:${col};border-color:${col};color:#fff;font-weight:600`:`border-color:${col}55;color:${col};background:${col}0d`}" onclick="setC('${aR}','${c.name.replace(/'/g,"\\'")}')">
       ${i+1}위 ${c.name}</button>`;
   }).join('');
 }
@@ -249,22 +296,34 @@ function setC(r,n){aC=DB[r].find(c=>c.name===n);render();}
 
 function renderRegion(y){
   const py=y-1,regs=aR?[aR]:RG;
-  document.getElementById('kLbl').textContent=aR?`핵심 지표 — ${aR} (${y}년)`:`핵심 지표 — 4개 권역 (${y}년)`;
+  document.getElementById('kLbl').textContent=aR?`📊 핵심 지표 — ${aR} (${y}년)`:`📊 핵심 지표 — 4개 권역 (${y}년)`;
   const ke=document.getElementById('kRow');
   ke.style.gridTemplateColumns=`repeat(${Math.min(regs.length,4)},1fr)`;
   ke.innerHTML=regs.map(r=>{
     const v=ST[r].ph[y]||0,vp=ST[r].ph[py]||0,rv=ST[r].rev[y]||0,d=pct(v,vp);
-    return`<div class="kpi" style="border-top-color:${CL[r]}"><div class="lbl">${r} 홀당 매출</div><div class="val">${v.toLocaleString()}<span class="unit"> 백만</span></div><div class="sub">${fD(d)}<span class="nt"> 평균 ${rv.toFixed(0)}억</span></div></div>`;
+    return`<div class="kpi" style="border-top-color:${CL[r]}">
+      <div class="lbl">${r} 홀당 매출</div>
+      <div class="val">${v.toLocaleString()}<span class="unit"> 백만</span></div>
+      <div class="sub">${fD(d)}<span class="nt"> 평균 ${rv.toFixed(0)}억</span></div>
+    </div>`;
   }).join('');
   const re=document.getElementById('rRow');
   re.style.gridTemplateColumns=`repeat(${Math.min(regs.length,4)},1fr)`;
   re.innerHTML=regs.map(r=>{
     const oi=ST[r].oi[y]||0,ni=ST[r].ni[y]||0;
-    return`<div class="rkpi" style="border-top-color:${CL[r]}55"><div class="lbl">${r}</div><div class="val">${oi.toFixed(1)}<span style="font-size:11px;font-weight:400">억</span></div><div class="sub nt">영업이익 ${fD(pct(oi,ST[r].oi[py]))}</div><div style="margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary)"><div class="val">${ni.toFixed(1)}<span style="font-size:11px;font-weight:400">억</span></div><div class="sub nt">당기순이익 ${fD(pct(ni,ST[r].ni[py]))}</div></div></div>`;
+    return`<div class="rkpi" style="border-top-color:${CL[r]}66">
+      <div class="lbl">${r}</div>
+      <div class="val">${oi.toFixed(1)}<span style="font-size:12px;font-weight:400">억</span></div>
+      <div class="sub nt">영업이익 ${fD(pct(oi,ST[r].oi[py]))}</div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0">
+        <div class="val">${ni.toFixed(1)}<span style="font-size:12px;font-weight:400">억</span></div>
+        <div class="sub nt">당기순이익 ${fD(pct(ni,ST[r].ni[py]))}</div>
+      </div>
+    </div>`;
   }).join('');
   document.getElementById('ch1').innerHTML='매출액 추이 <span class="bdg">핵심</span>';
   document.getElementById('ch2').innerHTML='홀당 매출액 추이 <span class="bdg">핵심</span>';
-  const mk=(id,m,cb,li)=>mkChart(id,regs.map(r=>({label:r,data:YR.map(y=>ST[r][m][y]||0),borderColor:CL[r],backgroundColor:CL[r]+'22',fill:false,tension:.35,pointRadius:3.5,pointHoverRadius:5})),cb,li,regs.map(r=>CL[r]));
+  const mk=(id,m,cb,li)=>mkChart(id,regs.map(r=>({label:r,data:YR.map(y=>ST[r][m][y]||0),borderColor:CL[r],backgroundColor:CL[r]+'22',fill:false,tension:.35,pointRadius:4,pointHoverRadius:6})),cb,li,regs.map(r=>CL[r]));
   mk('c1','rev',v=>v.toFixed(0)+'억','l1');
   mk('c2','ph',v=>v.toLocaleString()+'백만','l2');
   mk('c3','oi',v=>v.toFixed(0)+'억','l3');
@@ -274,23 +333,43 @@ function renderRegion(y){
 
 function renderClub(y){
   const c=aC,col=CL[c.r],py=y-1;
-  document.getElementById('kLbl').textContent=`핵심 지표 — ${c.name} (${y}년)`;
+  document.getElementById('kLbl').textContent=`📊 ${c.name} — 핵심 지표 (${y}년)`;
   const phY=c.ph[y]??null,rvY=c.rev[y]??null;
   const ke=document.getElementById('kRow');
   ke.style.gridTemplateColumns='repeat(2,1fr)';
-  ke.innerHTML=`<div class="kpi" style="border-top-color:${col}"><div class="lbl">홀당 매출 (${y}년)</div><div class="val">${phY!=null?phY.toLocaleString():'-'}<span class="unit"> 백만</span></div><div class="sub">${fD(pct(phY,c.ph[py]))}<span class="nt"> 전년대비</span></div></div><div class="kpi" style="border-top-color:${col}88"><div class="lbl">매출액 (${y}년)</div><div class="val">${rvY!=null?rvY.toFixed(1):'-'}<span class="unit"> 억</span></div><div class="sub">${fD(pct(rvY,c.rev[py]))}<span class="nt"> ${c.h}홀</span></div></div>`;
+  ke.innerHTML=`
+    <div class="kpi" style="border-top-color:${col}">
+      <div class="lbl">홀당 매출 (${y}년)</div>
+      <div class="val">${phY!=null?phY.toLocaleString():'-'}<span class="unit"> 백만</span></div>
+      <div class="sub">${fD(pct(phY,c.ph[py]))}<span class="nt"> 전년대비</span></div>
+    </div>
+    <div class="kpi" style="border-top-color:${col}88">
+      <div class="lbl">매출액 (${y}년)</div>
+      <div class="val">${rvY!=null?rvY.toFixed(1):'-'}<span class="unit"> 억</span></div>
+      <div class="sub">${fD(pct(rvY,c.rev[py]))}<span class="nt"> ${c.h}홀</span></div>
+    </div>`;
   const oiY=c.oi[y]??null,niY=c.ni[y]??null;
   const re=document.getElementById('rRow');
   re.style.gridTemplateColumns='repeat(2,1fr)';
-  re.innerHTML=`<div class="rkpi" style="border-top-color:${col}55"><div class="lbl">영업이익 (${y}년)</div><div class="val">${oiY!=null?oiY.toFixed(1):'-'}<span style="font-size:11px;font-weight:400">억</span></div><div class="sub nt">${fD(pct(oiY,c.oi[py]))}</div></div><div class="rkpi" style="border-top-color:${col}44"><div class="lbl">당기순이익 (${y}년)</div><div class="val">${niY!=null?niY.toFixed(1):'-'}<span style="font-size:11px;font-weight:400">억</span></div><div class="sub nt">${fD(pct(niY,c.ni[py]))}</div></div>`;
+  re.innerHTML=`
+    <div class="rkpi" style="border-top-color:${col}55">
+      <div class="lbl">영업이익 (${y}년)</div>
+      <div class="val">${oiY!=null?oiY.toFixed(1):'-'}<span style="font-size:12px;font-weight:400">억</span></div>
+      <div class="sub nt">${fD(pct(oiY,c.oi[py]))}</div>
+    </div>
+    <div class="rkpi" style="border-top-color:${col}44">
+      <div class="lbl">당기순이익 (${y}년)</div>
+      <div class="val">${niY!=null?niY.toFixed(1):'-'}<span style="font-size:12px;font-weight:400">억</span></div>
+      <div class="sub nt">${fD(pct(niY,c.ni[py]))}</div>
+    </div>`;
   document.getElementById('ch1').innerHTML=`${c.name} 매출액 추이 <span class="bdg">핵심</span>`;
   document.getElementById('ch2').innerHTML=`${c.name} 홀당 매출 추이 <span class="bdg">핵심</span>`;
   const mkC=(id,m,cb,li)=>{
     const ds=[
       {label:c.name,data:YR.map(y=>c[m][y]??null),borderColor:col,backgroundColor:col+'22',fill:false,tension:.35,pointRadius:4,pointHoverRadius:6,spanGaps:true},
-      {label:`${c.r} 평균`,data:YR.map(y=>ST[c.r][m][y]??0),borderColor:'#aaa',backgroundColor:'transparent',fill:false,tension:.35,pointRadius:2,borderDash:[4,3],spanGaps:true},
+      {label:`${c.r} 평균`,data:YR.map(y=>ST[c.r][m][y]??0),borderColor:'#ccc',backgroundColor:'transparent',fill:false,tension:.35,pointRadius:3,borderDash:[5,4],spanGaps:true},
     ];
-    mkChart(id,ds,cb,li,[col,'#aaa']);
+    mkChart(id,ds,cb,li,[col,'#ccc']);
   };
   mkC('c1','rev',v=>v!=null?v.toFixed(1)+'억':'-','l1');
   mkC('c2','ph',v=>v!=null?v.toLocaleString()+'백만':'-','l2');
@@ -302,15 +381,15 @@ function renderClub(y){
 function mkChart(id,ds,cb,li,cols){
   const ctx=document.getElementById(id).getContext('2d');
   if(CH[id])CH[id].destroy();
-  CH[id]=new Chart(ctx,{type:'line',data:{labels:YR.map(y=>y+'년'),datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:d=>`${d.dataset.label}: ${cb(d.raw)}`}}},scales:{y:{min:0,beginAtZero:true,ticks:{callback:v=>cb(v),font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}},x:{ticks:{font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+  CH[id]=new Chart(ctx,{type:'line',data:{labels:YR.map(y=>y+'년'),datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:d=>`${d.dataset.label}: ${cb(d.raw)}`}}},scales:{y:{min:0,beginAtZero:true,ticks:{callback:v=>cb(v),font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}}}}});
   document.getElementById(li).innerHTML=ds.map((d,i)=>`<div class="li"><div class="ld" style="background:${cols[i]||'#888'}"></div>${d.label}</div>`).join('');
 }
 
 function renderTable(y){
   let clubs,title,note='';
-  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} 홀당 매출 TOP 10 (${y}년)`;note=`* ${aC.name} 강조 표시`;}
+  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} 홀당 매출 TOP 10 (${y}년 기준)`;note=`* ${aC.name} 강조 표시`;}
   else if(aR){clubs=sorted(aR,y);title=`${aR} 골프장 홀당 매출 순위 (${y}년 · ${clubs.length}개소)`;}
-  else{clubs=sorted(null,y).slice(0,30);title=`전체 골프장 홀당 매출 TOP 30 (${y}년)`;note='* 4개 권역 전체 기준 TOP 30';}
+  else{clubs=sorted(null,y).slice(0,30);title=`전체 골프장 홀당 매출 TOP 30 (${y}년 기준)`;note='* 4개 권역 전체 기준 TOP 30';}
   document.getElementById('tTit').textContent=title;
   document.getElementById('tN').textContent=note;
   document.getElementById('tH').innerHTML=`<th>#</th><th>골프장명</th><th>권역</th><th>홀수</th><th>매출액</th><th>홀당 매출</th><th>영업이익</th><th>당기순이익</th>`;
@@ -319,18 +398,30 @@ function renderTable(y){
   document.getElementById('tB').innerHTML=clubs.map((c,i)=>{
     const pv=c.ph[y]||0,pt=(pv/mx*100).toFixed(0),ab=pv>=avg,col=CL[c.r];
     const sel=aC&&aC.name===c.name;
-    return`<tr style="${sel?`background:${col}11`:''}">
-      <td style="color:var(--color-text-secondary);font-size:11px">${i+1}</td>
-      <td style="font-weight:${sel?600:400}">${c.name}</td>
-      <td><span style="font-size:10px;padding:2px 6px;border-radius:99px;background:${col}22;color:${col}">${c.r}</span></td>
-      <td style="text-align:center;color:var(--color-text-secondary)">${c.h}홀</td>
-      <td style="color:var(--color-text-secondary)">${c.rev[y]!=null?c.rev[y].toFixed(1)+'억':'-'}</td>
-      <td><div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#bbb'}"></div></div><span style="min-width:56px;font-weight:${ab?600:400};color:${ab?col:'var(--color-text-primary)'}">${pv.toLocaleString()}백만</span></div></td>
-      <td style="font-size:12px;color:var(--color-text-secondary)">${c.oi[y]!=null?c.oi[y].toFixed(1)+'억':'-'}</td>
-      <td style="font-size:12px;color:var(--color-text-secondary)">${c.ni[y]!=null?c.ni[y].toFixed(1)+'억':'-'}</td>
+    return`<tr style="${sel?`background:${col}0d`:''}">
+      <td style="color:#bbb;font-size:12px">${i+1}</td>
+      <td style="font-weight:${sel?700:500}">${c.name}</td>
+      <td><span style="font-size:11px;padding:3px 8px;border-radius:99px;background:${col}18;color:${col};font-weight:600">${c.r}</span></td>
+      <td style="text-align:center;color:#999">${c.h}홀</td>
+      <td style="color:#999">${c.rev[y]!=null?c.rev[y].toFixed(1)+'억':'-'}</td>
+      <td><div class="bw">
+        <div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div>
+        <span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${pv.toLocaleString()}백만</span>
+      </div></td>
+      <td style="color:#999">${c.oi[y]!=null?c.oi[y].toFixed(1)+'억':'-'}</td>
+      <td style="color:#999">${c.ni[y]!=null?c.ni[y].toFixed(1)+'억':'-'}</td>
     </tr>`;
-  }).join('')+`<tr class="avr"><td colspan="5" style="font-size:12px">📌 ${aR||'전체'} 평균 (${y}년)</td><td><div class="bw"><div class="bb"><div class="bf" style="width:${(avg/mx*100).toFixed(0)}%;background:#999"></div></div><span style="min-width:56px">${avg.toLocaleString()}백만</span></div></td><td colspan="2"></td></tr>`;
+  }).join('')+`<tr class="avr">
+    <td colspan="5" style="color:#777">📌 ${aR||'전체'} 평균 (${y}년)</td>
+    <td><div class="bw">
+      <div class="bb"><div class="bf" style="width:${(avg/mx*100).toFixed(0)}%;background:#999"></div></div>
+      <span style="min-width:60px">${avg.toLocaleString()}백만</span>
+    </div></td>
+    <td colspan="2"></td>
+  </tr>`;
 }
 
 render();
 </script>
+</body>
+</html>
