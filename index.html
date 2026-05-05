@@ -73,6 +73,14 @@ tr:hover td{background:#fafafa;}
 /* 구분선 */
 .section-div{height:1px;background:#ebebeb;margin:28px 0;}
 
+/* 모바일 탭 피드백 */
+.rtab,.chip,.sbtn,#ySel{-webkit-tap-highlight-color:transparent;transition:transform .1s ease, background-color .15s, border-color .15s, opacity .12s;}
+.rtab:active,.chip:active,.sbtn:active{transform:scale(0.94);opacity:0.85;}
+button{cursor:pointer;}
+@media(hover:none){
+  .rtab:active,.chip:active,.sbtn:active{transform:scale(0.92);filter:brightness(0.92);}
+}
+
 @media(max-width:900px){.krow,.rrow{grid-template-columns:repeat(2,1fr);}.cgrid{grid-template-columns:1fr;}}
 @media(max-width:560px){.krow,.rrow{grid-template-columns:1fr;}.wrap{padding:20px 16px;}.hdr-left h1{font-size:20px;}}
 </style>
@@ -86,8 +94,8 @@ tr:hover td{background:#fafafa;}
     <p>수도권 · 강원권 · 경북권 · 경남권 &nbsp;|&nbsp; 홀당 매출 기준 비교 &nbsp;|&nbsp; 포항 학전 골프장(18홀) 개발 참고자료</p>
   </div>
   <select id="ySel" onchange="render()">
-    <option value="2025">2025년</option>
-    <option value="2024" selected>2024년</option>
+    <option value="2025" selected>2025년</option>
+    <option value="2024">2024년</option>
     <option value="2023">2023년</option>
     <option value="2022">2022년</option>
     <option value="2021">2021년</option>
@@ -97,6 +105,11 @@ tr:hover td{background:#fafafa;}
 
 <div class="rtabs" id="rtabs"></div>
 <div class="chips" id="chips"></div>
+
+<div id="sortBar" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+  <span style="font-size:12px;color:#888;font-weight:600;letter-spacing:.04em;">정렬 기준</span>
+  <div id="sortBtns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+</div>
 
 <div class="slbl" id="kLbl">📊 핵심 지표 — 매출액 · 홀당 매출액</div>
 <div class="krow" id="kRow"></div>
@@ -263,17 +276,33 @@ const DB={
   ],
 };
 
-function sorted(rg,y){
+function sorted(rg,y,metric){
+  const m=metric||sortBy;
   const lst=rg?[...DB[rg]]:[...DB.수도권,...DB.강원권,...DB.경북권,...DB.경남권];
-  return lst.filter(c=>c.ph[y]!=null).sort((a,b)=>(b.ph[y]||0)-(a.ph[y]||0));
+  return lst.filter(c=>c[m][y]!=null).sort((a,b)=>(b[m][y]||0)-(a[m][y]||0));
 }
 
-let aR=null,aC=null,CH={};
+let aR=null,aC=null,CH={},sortBy='ph';
 const gY=()=>parseInt(document.getElementById('ySel').value);
 const pct=(a,b)=>(a!=null&&b!=null&&b>0)?((a-b)/b*100).toFixed(1):null;
 const fD=(v)=>{if(v==null)return'';const f=parseFloat(v);return`<span class="${f>=0?'up':'dn'}">${f>=0?'▲+':'▼'}${Math.abs(f)}%</span>`;};
+const buzz=()=>{try{if('vibrate' in navigator) navigator.vibrate(15);}catch(e){}};
 
-function render(){const y=gY();renderTabs();renderChips(y);if(aC)renderClub(y);else renderRegion(y);}
+const SORT_LABELS={ph:'홀당 매출',rev:'매출액',oi:'영업이익',ni:'당기순이익'};
+const SORT_UNITS={ph:'백만',rev:'억',oi:'억',ni:'억'};
+
+function setSort(m){sortBy=m;buzz();render();}
+
+function render(){const y=gY();renderTabs();renderSortBtns();renderChips(y);if(aC)renderClub(y);else renderRegion(y);}
+
+function renderSortBtns(){
+  const el=document.getElementById('sortBtns');
+  const btns=[['ph','홀당 매출'],['rev','매출액'],['oi','영업이익'],['ni','당기순이익']];
+  el.innerHTML=btns.map(([k,lbl])=>{
+    const on=sortBy===k;
+    return`<button class="sbtn" style="font-size:12px;padding:5px 14px;border-radius:8px;border:1px solid ${on?'#333':'#ddd'};background:${on?'#333':'#fff'};color:${on?'#fff':'#666'};cursor:pointer;font-weight:${on?600:500};font-family:'Noto Sans KR',sans-serif;transition:all .12s;" onclick="setSort('${k}')">${lbl}</button>`;
+  }).join('');
+}
 
 function renderTabs(){
   document.getElementById('rtabs').innerHTML=
@@ -282,7 +311,7 @@ function renderTabs(){
       return`<button class="rtab${on?' on':''}" style="${on?`background:${c};border-color:${c};color:#fff;font-weight:600`:`color:${c};border-color:${c}55`}" onclick="setR('${r}')">${r}</button>`;
     }).join('');
 }
-function setR(r){aR=r;aC=null;render();}
+function setR(r){buzz();aR=r;aC=null;render();}
 
 function renderChips(y){
   const el=document.getElementById('chips');
@@ -294,7 +323,7 @@ function renderChips(y){
       ${i+1}위 ${c.name}</button>`;
   }).join('');
 }
-function setC(r,n){aC=DB[r].find(c=>c.name===n);render();}
+function setC(r,n){buzz();aC=DB[r].find(c=>c.name===n);render();}
 
 function renderRegion(y){
   const py=y-1,regs=aR?[aR]:RG;
@@ -389,37 +418,46 @@ function mkChart(id,ds,cb,li,cols){
 
 function renderTable(y){
   let clubs,title,note='';
-  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} 홀당 매출 TOP 10 (${y}년 기준)`;note=`* ${aC.name} 강조 표시`;}
-  else if(aR){clubs=sorted(aR,y);title=`${aR} 골프장 홀당 매출 순위 (${y}년 · ${clubs.length}개소)`;}
-  else{clubs=sorted(null,y).slice(0,30);title=`전체 골프장 홀당 매출 TOP 30 (${y}년 기준)`;note='* 4개 권역 전체 기준 TOP 30';}
+  const sortLbl=SORT_LABELS[sortBy];
+  if(aC){clubs=sorted(aR,y).slice(0,10);title=`${aR} ${sortLbl} TOP 10 (${y}년 기준)`;note=`* ${aC.name} 강조 표시`;}
+  else if(aR){clubs=sorted(aR,y);title=`${aR} 골프장 ${sortLbl} 순위 (${y}년 · ${clubs.length}개소)`;}
+  else{clubs=sorted(null,y).slice(0,30);title=`전체 골프장 ${sortLbl} TOP 30 (${y}년 기준)`;note='* 4개 권역 전체 기준 TOP 30';}
   document.getElementById('tTit').textContent=title;
   document.getElementById('tN').textContent=note;
-  document.getElementById('tH').innerHTML=`<th>#</th><th>골프장명</th><th>권역</th><th>홀수</th><th>매출액</th><th>홀당 매출</th><th>영업이익</th><th>당기순이익</th>`;
-  const mx=Math.max(...clubs.map(c=>c.ph[y]||0));
-  const avg=Math.round(clubs.reduce((s,c)=>s+(c.ph[y]||0),0)/clubs.length);
+  // 정렬 기준 컬럼을 강조 표시
+  const cols=[['ph','홀당 매출'],['rev','매출액'],['oi','영업이익'],['ni','당기순이익']];
+  document.getElementById('tH').innerHTML=`<th>#</th><th>골프장명</th><th>권역</th><th>홀수</th>`+cols.map(([k,lbl])=>{
+    const isSort=k===sortBy;
+    return `<th style="${isSort?'color:#333;background:#f5f5f3':''}">${lbl}${isSort?' ▼':''}</th>`;
+  }).join('');
+  const sortKey=sortBy, sortUnit=SORT_UNITS[sortBy];
+  const mx=Math.max(...clubs.map(c=>c[sortKey][y]||0));
+  const validVals=clubs.map(c=>c[sortKey][y]||0).filter(v=>v>0);
+  const avg=validVals.length?(validVals.reduce((a,b)=>a+b,0)/validVals.length):0;
+  const avgDisp=sortKey==='ph'?Math.round(avg):avg.toFixed(1);
   document.getElementById('tB').innerHTML=clubs.map((c,i)=>{
-    const pv=c.ph[y]||0,pt=(pv/mx*100).toFixed(0),ab=pv>=avg,col=CL[c.r];
+    const sv=c[sortKey][y]||0;
+    const pt=mx?(sv/mx*100).toFixed(0):0;
+    const ab=sv>=avg, col=CL[c.r];
     const sel=aC&&aC.name===c.name;
+    const fmt=(k,v)=>{if(v==null)return'-';return k==='ph'?v.toLocaleString()+'백만':v.toFixed(1)+'억';};
+    const cellStyle=(k)=>k===sortKey?`background:${col}08`:'';
     return`<tr style="${sel?`background:${col}0d`:''}">
       <td style="color:#bbb;font-size:12px">${i+1}</td>
       <td style="font-weight:${sel?700:500}">${c.name}</td>
       <td><span style="font-size:11px;padding:3px 8px;border-radius:99px;background:${col}18;color:${col};font-weight:600">${c.r}</span></td>
       <td style="text-align:center;color:#999">${c.h}홀</td>
-      <td style="color:#999">${c.rev[y]!=null?c.rev[y].toFixed(1)+'억':'-'}</td>
-      <td><div class="bw">
-        <div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div>
-        <span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${pv.toLocaleString()}백만</span>
-      </div></td>
-      <td style="color:#999">${c.oi[y]!=null?c.oi[y].toFixed(1)+'억':'-'}</td>
-      <td style="color:#999">${c.ni[y]!=null?c.ni[y].toFixed(1)+'억':'-'}</td>
+      <td style="${cellStyle('ph')};${sortKey==='ph'?'':'color:#999'}">${sortKey==='ph'?`<div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div><span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${fmt('ph',c.ph[y])}</span></div>`:fmt('ph',c.ph[y])}</td>
+      <td style="${cellStyle('rev')};${sortKey==='rev'?'':'color:#999'}">${sortKey==='rev'?`<div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div><span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${fmt('rev',c.rev[y])}</span></div>`:fmt('rev',c.rev[y])}</td>
+      <td style="${cellStyle('oi')};${sortKey==='oi'?'':'color:#999'}">${sortKey==='oi'&&c.oi[y]!=null?`<div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div><span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${fmt('oi',c.oi[y])}</span></div>`:fmt('oi',c.oi[y])}</td>
+      <td style="${cellStyle('ni')};${sortKey==='ni'?'':'color:#999'}">${sortKey==='ni'&&c.ni[y]!=null?`<div class="bw"><div class="bb"><div class="bf" style="width:${pt}%;background:${ab?col:'#ddd'}"></div></div><span style="min-width:60px;font-weight:${ab?700:400};color:${ab?col:'#555'}">${fmt('ni',c.ni[y])}</span></div>`:fmt('ni',c.ni[y])}</td>
     </tr>`;
   }).join('')+`<tr class="avr">
-    <td colspan="5" style="color:#777">📌 ${aR||'전체'} 평균 (${y}년)</td>
-    <td><div class="bw">
-      <div class="bb"><div class="bf" style="width:${(avg/mx*100).toFixed(0)}%;background:#999"></div></div>
-      <span style="min-width:60px">${avg.toLocaleString()}백만</span>
+    <td colspan="4" style="color:#777">📌 ${aR||'전체'} 평균 (${y}년 · ${sortLbl})</td>
+    <td colspan="4" style="text-align:left;padding-left:12px;"><div class="bw">
+      <div class="bb"><div class="bf" style="width:${mx?(avg/mx*100).toFixed(0):0}%;background:#999"></div></div>
+      <span style="min-width:60px;font-weight:700">${avgDisp}${sortUnit}</span>
     </div></td>
-    <td colspan="2"></td>
   </tr>`;
 }
 
