@@ -208,7 +208,109 @@ button{cursor:pointer;}
   <div class="tn" id="tN"></div>
 </div>
 
+<!-- 푸터: 제작자 정보 -->
+<footer class="ftr">
+  <div class="ftr-content">
+    <div class="ftr-left">
+      <div class="ftr-label">제작</div>
+      <div class="ftr-creator">바로자산운용 · 이주원 상무</div>
+    </div>
+    <button class="contact-btn" onclick="openContact()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span>명함 보기</span>
+    </button>
+  </div>
+</footer>
+
+<!-- 연락처 모달 -->
+<div id="contactModal" class="modal-bg" onclick="if(event.target===this)closeContact()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeContact()" aria-label="닫기">×</button>
+    <div class="profile-avatar">이</div>
+    <div class="profile-name">이주원</div>
+    <div class="profile-title">바로자산운용 상무</div>
+    <div class="profile-divider"></div>
+    
+    <a class="contact-action primary" href="https://link.rmbr.in/hngnz2g" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 8h20"></path><circle cx="8" cy="14" r="2"></circle><path d="M14 12h4M14 16h4"></path></svg>
+      <span>리멤버 명함 보기 / 저장</span>
+    </a>
+    
+    <button class="contact-action" onclick="downloadVCard()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <span>연락처 다운로드 (.vcf)</span>
+    </button>
+    
+    <p class="contact-note">아이폰/갤럭시에서 위 버튼을 눌러<br>주소록에 바로 저장할 수 있어요</p>
+  </div>
 </div>
+
+</div>
+
+<style>
+.ftr{margin-top:32px;padding:20px 0;border-top:1px solid #ebebeb;}
+.ftr-content{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.ftr-left{display:flex;align-items:center;gap:10px;}
+.ftr-label{font-size:11px;color:#bbb;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.ftr-creator{font-size:13px;color:#666;font-weight:500;}
+.contact-btn{display:flex;align-items:center;gap:6px;font-size:12px;padding:8px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:500;transition:all .15s;}
+.contact-btn:hover{border-color:#888;color:#222;}
+.contact-btn:active{transform:scale(0.96);}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(20,20,20,.55);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.modal-bg.show{display:flex;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:20px;padding:32px 24px 28px;max-width:340px;width:100%;text-align:center;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.15);animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;border:none;background:transparent;font-size:22px;color:#bbb;cursor:pointer;line-height:1;}
+.modal-close:hover{background:#f5f5f3;color:#666;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#378ADD,#1D9E75);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.profile-name{font-size:20px;font-weight:700;color:#111;margin-bottom:4px;}
+.profile-title{font-size:13px;color:#888;margin-bottom:18px;}
+.profile-divider{height:1px;background:#f0f0f0;margin-bottom:16px;}
+.contact-action{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;border:1px solid #e5e5e5;background:#fff;color:#333;text-decoration:none;margin-bottom:8px;transition:all .15s;}
+.contact-action:hover{background:#fafaf8;}
+.contact-action:active{transform:scale(0.98);}
+.contact-action.primary{background:#111;color:#fff;border-color:#111;}
+.contact-action.primary:hover{background:#000;}
+.contact-note{font-size:11px;color:#bbb;margin-top:14px;line-height:1.6;}
+
+@media(max-width:560px){
+  .modal{padding:28px 20px 24px;border-radius:18px;}
+  .ftr-content{flex-direction:column;align-items:flex-start;}
+}
+</style>
+
+<script>
+function openContact(){
+  buzz();
+  document.getElementById('contactModal').classList.add('show');
+}
+function closeContact(){
+  document.getElementById('contactModal').classList.remove('show');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeContact();});
+
+function downloadVCard(){
+  buzz();
+  const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:이주원
+N:이;주원;;;
+ORG:바로자산운용
+TITLE:상무
+END:VCARD`;
+  const blob = new Blob([vcard], {type:'text/vcard;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '이주원_바로자산운용.vcf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 100);
+}
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
